@@ -1,0 +1,7 @@
+gen/
+__pycache__/
+
+*.so
+*.swp
+*.sow
+*.pyc

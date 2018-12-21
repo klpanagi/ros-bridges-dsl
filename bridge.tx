@@ -1,0 +1,42 @@
+RosBridgeModel:
+    amqpBroker=AMQPBroker
+    packageCfg=PackageCfg
+
+    'AMQPBridges' '{'
+        'pubs: ' '[' amqppubs*=[AMQPPubBridge] ']'
+    '}'
+
+	amqppubbridges*=AMQPPubBridge
+;
+
+AMQPPubBridge:
+	('AMQPPubBridge' name=ID '{'
+		'rosTopic:' rosTopic=STRING
+		'amqpExchange:' amqpExchange=STRING
+		'amqpTopic:' amqpTopic=STRING
+		'amqpTopicNamespace:' amqpTopicNamespace=STRING
+		'rosMessage:' rosMessage=STRING
+	'}')?
+;
+
+AMQPBroker:
+   	('AMQPBroker' '{'
+		'ip:' ip=STRING
+		'port:' port=STRING
+		'username:' username=STRING
+		'password:' password=STRING
+	'}')?
+;
+
+PackageCfg:
+	'PackageConfig' '{'
+        'name:' name=STRING
+        'description:' description=STRING
+        'version:' version=STRING
+        'rosdeps:' '[' rosdeps*=STRING ']'
+    '}'
+;
+
+Comment:
+  /\/\/.*$/
+;
