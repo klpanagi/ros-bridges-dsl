@@ -15,7 +15,8 @@ AMQPPubBridge:
 		'amqpExchange:' amqpExchange=STRING
 		'amqpTopic:' amqpTopic=STRING
 		'amqpTopicNamespace:' amqpTopicNamespace=STRING
-		'rosMessage:' rosMessage=STRING
+		'rosMessageType:' rosMessageType=STRING
+		'rosMessagePackage:' rosMessagePackage=STRING
 	'}')?
 ;
 

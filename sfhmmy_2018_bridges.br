@@ -13,7 +13,7 @@ PackageConfig {
 }
 
 AMQPBridges {
-  pubs: [SonarFront SonarRear Camera]
+  pubs: [SonarFront SonarRear Camera LineFollower]
 }
 
 AMQPPubBridge SonarFront {
@@ -21,7 +21,8 @@ AMQPPubBridge SonarFront {
   amqpExchange: "amq.topic"
   amqpTopic: "sensors.range.sonar.front"
   amqpTopicNamespace: "robot_1"
-  rosMessage: "Range"
+  rosMessageType: "Range"
+  rosMessagePackage: "sensor_msgs"
 }
 
 AMQPPubBridge SonarRear {
@@ -29,7 +30,8 @@ AMQPPubBridge SonarRear {
   amqpExchange: "amq.topic"
   amqpTopic: "sensors.range.sonar.rear"
   amqpTopicNamespace: "robot_1"
-  rosMessage: "Range"
+  rosMessageType: "Range"
+  rosMessagePackage: "sensor_msgs"
 }
 
 AMQPPubBridge Camera {
@@ -37,7 +39,15 @@ AMQPPubBridge Camera {
   amqpExchange: "amq.topic"
   amqpTopic: "sensors.vision.camera.rgb.front"
   amqpTopicNamespace: "robot_1"
-  rosMessage: "Image"
+  rosMessageType: "Image"
+  rosMessagePackage: "sensor_msgs"
 }
 
-
+AMQPPubBridge LineFollower {
+  rosTopic: "/sensors/navigation/lfs/front"
+  amqpExchange: "amq.topic"
+  amqpTopic: "sensors.navigationn.lfs.front"
+  amqpTopicNamespace: "robot_1"
+  rosMessageType: "LfSensor"
+  rosMessagePackage: "lf_sensor_hw_interface"
+}

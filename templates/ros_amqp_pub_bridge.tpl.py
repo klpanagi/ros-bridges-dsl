@@ -1,8 +1,7 @@
 #!/usr/bin/env python2
 
 import rospy
-from std_msgs.msg import *
-from sensor_msgs.msg import *
+from {{ bridge.rosMessagePackage }}.msg import {{ bridge.rosMessageType }}
 
 import amqp_common
 from rosconversions import ros_msg_to_dict
@@ -20,7 +19,7 @@ class {{ bridge.name }}Bridge(object):
         self.amqp_broker_port = "{{ amqp_broker.port }}"
         self.username = "{{ amqp_broker.username }}"
         self.password = "{{ amqp_broker.password }}"
-        self.ros_message_type = {{ bridge.rosMessage }}
+        self.ros_message_type = {{ bridge.rosMessageType }}
         self.ros_node_name = self.__class__.__name__
 
     def run(self):
