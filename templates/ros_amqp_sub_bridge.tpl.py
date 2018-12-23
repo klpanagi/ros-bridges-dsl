@@ -33,37 +33,33 @@ class {{ bridge.name }}Bridge(object):
 
     def run(self):
         """Start the Bridge"""
-        self._init_ros_subscriber()
-        self._init_platform_publisher()
+        self._init_platform_subscriber()
+        self._init_ros_publisher()
         while not rospy.is_shutdown():
-            rospy.sleep(0.001)  # Sleep for 1ms to free cpu resources
+            rospy.sleep(0.001)
 
-    def _init_ros_subscriber(self):
+    def _init_ros_publisher(self):
         rospy.init_node(self.ros_node_name)
-        rospy.loginfo('ROS Subscriber <{}> ready!'.format(self.ros_topic))
-        rospy.Subscriber(self.ros_topic, self.ros_message_type,
-                         self._ros_callback)
+        self.pub = rospy.Publisher(self.ros_topic, self.ros_message_type,
+                                   queue_size=10)
+        rospy.loginfo('ROS Publisher <{}> ready!'.format(self.ros_topic))
 
-    def _ros_callback(self, msg):
-        data = ros_msg_to_dict(msg)
-        self._publish(data)
+    def _callback(self, msg, meta):
+        ros_msg = dict_to_ros_msg('ledstrip_hw_interface/RgbLedArray', msg)
+        self.pub.publish(ros_msg)
 
-    def _init_platform_publisher(self):
-        topic = '{}.{}'.format(self.amqp_topic_namespace, self.amqp_topic)
-        self.pub = amqp_common.PublisherSync(
-            topic,
+    def _init_platform_subscriber(self):
+        self.sub = amqp_common.SubscriberSync(
+            self.amqp_topic, on_message=self._callback,
             connection_params=amqp_common.ConnectionParameters(
-                host=self.amqp_broker_ip,
-                port=self.amqp_broker_port),
-            creds=amqp_common.Credentials(self.username,
-                                          self.password))
-        rospy.loginfo('AMQP Publisher <{}> ready!'.format(topic))
-
-    def _publish(self, data):
-        if not isinstance(data, dict):
-            raise TypeError('Data should be of type dict')
-        self.pub.publish(data)
-        rospy.loginfo('Publishing message: {}'.format(data))
+                host=self.amqp_broker_ip, port=self.amqp_broker_port,
+                vhost=self.amqp_broker_vhost),
+            queue_size=10,
+            creds=amqp_common.Credentials(self.username, self.password),
+            debug=self.debug
+        )
+        rospy.loginfo('AMQP Subscriber <{}> ready!'.format(self.ros_topic))
+        self.sub.run_threaded()
 
 
 if __name__ == '__main__':
