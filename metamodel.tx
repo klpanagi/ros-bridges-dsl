@@ -1,0 +1,98 @@
+RosBridgeModel:
+    amqpBroker=AMQPBroker
+    packageCfg=PackageCfg
+
+    'AMQPBridges' '{'
+        'pubs: ' '[' amqppubs*=[AMQPPubBridge] ']'
+    '}'
+
+	amqppubbridges*=AMQPPubBridge
+;
+
+AMQPPubBridge:
+	'AMQPPubBridge' name=ID '{'
+		'rosTopic:' rosTopic=STRING
+		'amqpExchange:' amqpExchange=STRING
+		'amqpTopic:' amqpTopic=STRING
+		'amqpTopicNamespace:' amqpTopicNamespace=STRING
+		'rosMessageType:' rosMessageType=STRING
+		'rosMessagePackage:' rosMessagePackage=STRING
+	'}'
+;
+
+AMQPBroker:
+   	'AMQPBroker' '{'
+		'ip:' ip=STRING
+		'port:' port=STRING
+		'username:' username=STRING
+		'password:' password=STRING
+	'}'
+;
+
+PackageCfg:
+	'PackageConfig' '{'
+        'name:' name=STRING
+        'description:' description=STRING
+        'version:' version=STRING
+        'rosdeps:' '[' rosdeps*=STRING ']'
+    '}'
+;
+/* -----------------------------*/
+
+AMQPTopic:
+	'AMQPTopic' name=ID '=> {'
+		'exchange:' exchange=STRING
+		'topic:' topic=STRING
+		'namespace:' namespace=STRING
+		'vhost:' vhost=STRING
+	'}'
+;
+
+ROSPubConnector:
+    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic]
+;
+
+ROSSubConnector:
+    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic]
+;
+
+ROSPackage:
+	'ROSPackage' name=STRING '=> {'
+        'description:' description=STRING
+        'version:' version=STRING
+        'rosdeps: ' '[' rosdeps*=STRING ']'
+        'nodes: ' '[' nodes*=ROSNode ']'
+    '}'
+;
+
+ROSNode:
+    'ROSNode' name=STRING '=> {'
+        'publishers: ' '[' publishers*=ROSPublisher ']'
+        'subscribers: ' '[' subscribers*=ROSSubscriber ']'
+    '}'
+;
+
+ROSPublisher:
+    'ROSPublisher' name=ID '=> {'
+        'topic: ' topic=[ROSTopic]
+        ('queueSize: ' queueSize=INT)?
+        ('latch: ' latch=BOOL)?
+    '}'
+;
+
+ROSSubscriber:
+    'ROSSubscriber' name=ID '=> {'
+        'topic: ' topic=[ROSTopic]
+    '}'
+;
+
+ROSTopic:
+    'ROSTopic' name=ID '=> {'
+        'name: ' uri=STRING
+        'msgType: ' msgPkg=STRING'/'msgType=STRING
+    '}'
+;
+
+Comment:
+  /\/\/.*$/
+;

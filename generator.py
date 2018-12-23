@@ -131,7 +131,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("[*] - Usage: python {} <model>".format(sys.argv[0]))
     else:
-        meta_model = metamodel_from_file(join(this_folder, 'bridge.tx'))
+        meta_model = metamodel_from_file(join(this_folder, 'metamodel.tx'))
         model = meta_model.model_from_file(sys.argv[1])
         gen = RosAMQPBridgesGen()
         gen.generate(model)
