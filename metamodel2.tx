@@ -1,0 +1,96 @@
+MetaModel:
+    amqpBroker=AMQPBroker
+    amqpTopics*=AMQPTopic
+    rosSubConnectors*=ROSSubConnector
+    rosPubConnectors*=ROSPubConnector
+    rosPubConnectors*=ROSPubConnector
+    rosPackages*=ROSPackage
+    rosNodes*=ROSNode
+    rosPublishers*=ROSPublisher
+    rosSubscribers*=ROSSubscriber
+    rosTopics*=ROSTopic
+    rosMasters*=ROSMaster
+    rosMessages*=ROSMessage
+;
+
+AMQPBroker:
+   	'AMQPBroker' '=> {'
+		'ip:' ip=STRING
+		'port:' port=STRING
+		'username:' username=STRING
+		'password:' password=STRING
+        'topics: ' '[' topics*=[AMQPTopic] ']'
+	'}'
+;
+
+AMQPTopic:
+	'AMQPTopic' name=ID '=> {'
+		'exchange:' exchange=STRING
+		'topic:' topic=STRING
+		'namespace:' namespace=STRING
+		'vhost:' vhost=STRING
+	'}'
+;
+
+ROSPubConnector:
+    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic]
+;
+
+ROSSubConnector:
+    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic]
+;
+
+ROSPackage:
+	'ROSPackage' name=ID '=> {'
+        'description:' description=STRING
+        'version:' version=STRING
+        'rosdeps: ' '[' rosdeps*=STRING ']'
+        'nodes: ' '[' nodes*=[ROSNode] ']'
+        'msgs: ' '[' msgs*=[ROSMessage] ']'
+    '}'
+;
+
+ROSNode:
+    'ROSNode' name=ID '=> {'
+        'publishers: ' '[' publishers*=[ROSPublisher] ']'
+        'subscribers: ' '[' subscribers*=[ROSSubscriber] ']'
+        'rosMaster: ' rosMaster=[ROSMaster]
+        ('namespace: ' namespace=STRING)?
+        ('anonymous: ' anonymous=BOOL)?
+    '}'
+;
+
+ROSPublisher:
+    'ROSPublisher' name=ID '=> {'
+        'topic: ' topic=[ROSTopic]
+        ('queueSize: ' queueSize=INT)?
+        ('latch: ' latch=BOOL)?
+    '}'
+;
+
+ROSSubscriber:
+    'ROSSubscriber' name=ID '=> {'
+        'topic: ' topic=[ROSTopic]
+    '}'
+;
+
+ROSTopic:
+    'ROSTopic' name=ID '=> {'
+        'name: ' uri=STRING
+        'msg: ' msg=[ROSMessage]
+    '}'
+;
+
+ROSMaster:
+    'ROSMaster' name=ID '=> {'
+        'uri: ' uri=STRING
+    '}'
+;
+
+ROSMessage:
+    'ROSMsg' name=ID '=> {' '}'
+;
+
+Comment:
+  /\/\/.*$/
+;
