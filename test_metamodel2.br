@@ -1,24 +1,21 @@
 AMQPBroker => {
-  ip: "155.207.33.185"
-  port: "5672"
-  username: 'robot_1'
-  password: 'r0b0t1'
-  topics: [ ]
+  ip = "155.207.33.185";
+  port = "5672";
+  username = 'robot_1';
+  password = 'r0b0t1';
+
+  section #topics
+    AMQPTopic testTopicAmqp => {
+      exchange = 'amq.topic';
+      topic = 'test';
+      namespace = 'com.test.';
+      vhost = '/';
+    }
+  endsection
 }
 
-ROSPackage testPkg => {
-  description: 'Test'
-  version: '0.0.1'
-  rosdeps: [ ]
-  nodes: [ testNode ]
-}
-
-ROSNode testNode => {
-  publishers: [ ]
-  subscribers: [ ]
-  rosMaster: testRosMaster
-}
-
-ROSMaster testRosMaster => {
-  uri: 'http://localhost:11311'
+ROSSystem => {
+  section #publishers
+ 
+  endsection
 }

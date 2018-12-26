@@ -87,7 +87,13 @@ class RosAMQPBridgesGen(Generator):
 
     def generate(self, model):
         broker = model.amqpBroker
-        pkg_cfg = model.packageCfg
+        topics = broker.topics
+        print(broker)
+        print(topics)
+        for topic in topics:
+            print(topic)
+
+        return
         self.logger.debug('[*] - AMQP Broker: {}:{}'.format(
             broker.ip, broker.port))
         self._mkdir(self.gen_dir)
@@ -134,5 +140,5 @@ if __name__ == '__main__':
         meta_model = metamodel_from_file(join(this_folder, 'metamodel2.tx'))
         model = meta_model.model_from_file(sys.argv[1])
         print(model)
-        #  gen = RosAMQPBridgesGen()
-        #  gen.generate(model)
+        gen = RosAMQPBridgesGen()
+        gen.generate(model)

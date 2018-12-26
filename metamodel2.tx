@@ -1,94 +1,77 @@
-MetaModel:
+RosAmqpConnectorsMetamodel:
     amqpBroker=AMQPBroker
-    amqpTopics*=AMQPTopic
     rosSubConnectors*=ROSSubConnector
     rosPubConnectors*=ROSPubConnector
-    rosPubConnectors*=ROSPubConnector
-    rosPackages*=ROSPackage
-    rosNodes*=ROSNode
-    rosPublishers*=ROSPublisher
-    rosSubscribers*=ROSSubscriber
-    rosTopics*=ROSTopic
-    rosMasters*=ROSMaster
-    rosMessages*=ROSMessage
+    rosSystem*=ROSSystem
 ;
 
 AMQPBroker:
    	'AMQPBroker' '=> {'
-		'ip:' ip=STRING
-		'port:' port=STRING
-		'username:' username=STRING
-		'password:' password=STRING
-        'topics: ' '[' topics*=[AMQPTopic] ']'
+		'ip =' ip=STRING ';'
+		'port =' port=STRING ';'
+		'username =' username=STRING ';'
+		'password =' password=STRING ';'
+
+        'section #topics'
+            topics*=AMQPTopic
+        'endsection'
 	'}'
 ;
 
 AMQPTopic:
 	'AMQPTopic' name=ID '=> {'
-		'exchange:' exchange=STRING
-		'topic:' topic=STRING
-		'namespace:' namespace=STRING
-		'vhost:' vhost=STRING
+		'exchange =' exchange=STRING ';'
+		'topic =' topic=STRING ';'
+		'namespace =' namespace=STRING ';'
+		'vhost =' vhost=STRING ';'
 	'}'
 ;
 
 ROSPubConnector:
-    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic]
+    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic] ';'
 ;
 
 ROSSubConnector:
-    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic]
+    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic] ';'
 ;
 
-ROSPackage:
-	'ROSPackage' name=ID '=> {'
-        'description:' description=STRING
-        'version:' version=STRING
-        'rosdeps: ' '[' rosdeps*=STRING ']'
-        'nodes: ' '[' nodes*=[ROSNode] ']'
-        'msgs: ' '[' msgs*=[ROSMessage] ']'
-    '}'
-;
+ROSSystem:
+   	'ROSSystem' '=> {'
+        ('section #publishers'
+            publishers*=ROSPublisher
+        'endsection')?
 
-ROSNode:
-    'ROSNode' name=ID '=> {'
-        'publishers: ' '[' publishers*=[ROSPublisher] ']'
-        'subscribers: ' '[' subscribers*=[ROSSubscriber] ']'
-        'rosMaster: ' rosMaster=[ROSMaster]
-        ('namespace: ' namespace=STRING)?
-        ('anonymous: ' anonymous=BOOL)?
+        ('section #subscribers'
+            subscribers*=ROSSubscriber
+        'endsection')?
+
+        ('section #topics'
+            topics*=ROSTopic
+        'endsection')?
     '}'
 ;
 
 ROSPublisher:
     'ROSPublisher' name=ID '=> {'
-        'topic: ' topic=[ROSTopic]
-        ('queueSize: ' queueSize=INT)?
-        ('latch: ' latch=BOOL)?
+        'topic =' topic=[ROSTopic] ';'
+        'nodeName =' nodeName=STRING ';'
+        ('queueSize =' queueSize=INT ';')?
+        ('latch =' latch=BOOL ';')?
     '}'
 ;
 
 ROSSubscriber:
     'ROSSubscriber' name=ID '=> {'
-        'topic: ' topic=[ROSTopic]
+        'topic =' topic=[ROSTopic] ';'
+        'nodeName =' nodeName=STRING ';'
     '}'
 ;
 
 ROSTopic:
     'ROSTopic' name=ID '=> {'
-        'name: ' uri=STRING
-        'msg: ' msg=[ROSMessage]
+        'name =' uri=STRING ';'
+        'msgType =' msgType=STRING ';'
     '}'
-;
-
-ROSMaster:
-    'ROSMaster' name=ID '=> {'
-        'uri: ' uri=STRING
-    '}'
-;
-
-ROSMessage:
-    'ROSMsg' name=ID '=> {' '}'
 ;
 
 Comment:
