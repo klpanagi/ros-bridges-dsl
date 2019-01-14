@@ -1,8 +1,8 @@
 RosAmqpConnectorsMetamodel:
     amqpBroker=AMQPBroker
+    rosSystem*=ROSSystem
     rosSubConnectors*=ROSSubConnector
     rosPubConnectors*=ROSPubConnector
-    rosSystem*=ROSSystem
 ;
 
 AMQPBroker:
@@ -28,11 +28,11 @@ AMQPTopic:
 ;
 
 ROSPubConnector:
-    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic] ';'
+    'Connector' name=ID rosPub=[ROSPublisher] '->' amqpTopic=[AMQPTopic] ';'
 ;
 
 ROSSubConnector:
-    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic] ';'
+    'Connector' name=ID rosSub=[ROSSubscriber] '<-' amqpTopic=[AMQPTopic] ';'
 ;
 
 ROSSystem:
@@ -54,7 +54,7 @@ ROSSystem:
 ROSPublisher:
     'ROSPublisher' name=ID '=> {'
         'topic =' topic=[ROSTopic] ';'
-        'nodeName =' nodeName=STRING ';'
+        ('nodeName =' nodeName=STRING ';')?
         ('queueSize =' queueSize=INT ';')?
         ('latch =' latch=BOOL ';')?
     '}'
@@ -63,13 +63,14 @@ ROSPublisher:
 ROSSubscriber:
     'ROSSubscriber' name=ID '=> {'
         'topic =' topic=[ROSTopic] ';'
-        'nodeName =' nodeName=STRING ';'
+        ('nodeName =' nodeName=STRING ';')?
     '}'
 ;
 
 ROSTopic:
     'ROSTopic' name=ID '=> {'
         'name =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
         'msgType =' msgType=STRING ';'
     '}'
 ;

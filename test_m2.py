@@ -88,8 +88,6 @@ class RosAMQPBridgesGen(Generator):
     def generate(self, model):
         broker = model.amqpBroker
         topics = broker.topics
-        print(broker)
-        print(topics)
         for topic in topics:
             print(topic)
 

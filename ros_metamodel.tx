@@ -1,4 +1,4 @@
-RosAmqpConnectorsMetamodel:
+ROSMetamodel:
     rosPackages*=ROSPackage
     rosNodes*=ROSNode
     rosPublishers*=ROSPublisher

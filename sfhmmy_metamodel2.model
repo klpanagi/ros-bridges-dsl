@@ -1,0 +1,37 @@
+AMQPBroker => {
+  ip = "155.207.33.185";
+  port = "5672";
+  username = 'robot_1';
+  password = 'r0b0t1';
+
+  section #topics
+    AMQPTopic SonarFrontAMQPTopic => {
+      exchange = 'amq.topic';
+      topic = 'sensors.range.sonar.front';
+      namespace = '';
+      vhost = '/';
+    }
+  endsection
+}
+
+ROSSystem => {
+  section #publishers
+    ROSPublisher SonarFrontROSPub => {
+      topic = SonarFrontROSTopic;
+    }
+  endsection
+
+  section #subscribers
+
+  endsection
+
+  section #topics
+    ROSTopic SonarFrontROSTopic => {
+      name = 'sensors/range/sonar/front';
+      namespace = '';
+      msgType = 'sensor_msgs/Range';
+    } 
+  endsection
+}
+
+Connector SonarFrontConnector SonarFrontROSPub -> SonarFrontAMQPTopic;
