@@ -7,10 +7,18 @@ AMQPBroker => {
   section #topics
     AMQPTopic SonarFrontAMQPTopic => {
       exchange = 'amq.topic';
-      topic = 'sensors.range.sonar.front';
-      namespace = '';
+      uri = 'sensor.range.sonar.front';
+      namespace = 'robot_1';
       vhost = '/';
     }
+
+    AMQPTopic MotionBaseMotorsAMQPTopic => {
+      exchange = 'amq.topic';
+      uri = 'effector.motion.base.motors';
+      namespace = 'robot_1';
+      vhost = '/';
+    }
+
   endsection
 }
 
@@ -22,16 +30,27 @@ ROSSystem => {
   endsection
 
   section #subscribers
+    ROSSubscriber MotionBaseMotorsROSSub => {
+      topic = MotionBaseMotorsROSTopic;
+    }
 
   endsection
 
   section #topics
     ROSTopic SonarFrontROSTopic => {
-      name = 'sensors/range/sonar/front';
+      uri = '/sensor/range/sonar/front';
       namespace = '';
       msgType = 'sensor_msgs/Range';
     } 
+
+    ROSTopic MotionBaseMotorsROSTopic => {
+      uri = '/effector/motion/base/motors';
+      namespace = '';
+      msgType = 'robot_communication/Motors';
+    } 
+
   endsection
 }
 
-Connector SonarFrontConnector SonarFrontROSPub -> SonarFrontAMQPTopic;
+ROSPubConnector SonarFrontConnector SonarFrontROSPub -> SonarFrontAMQPTopic;
+ROSSubConnector MotionBaseMotorsConnector MotionBaseMotorsAMQPTopic -> MotionBaseMotorsROSSub;

@@ -12,8 +12,21 @@ from textx import metamodel_from_file
 from _logging import create_logger
 
 
-class Generator(object):
+class ROSPackageCfg(object):
+    __slots__ = ['name', 'description', 'version', 'rosdeps']
 
+    def __init__(self,
+                 name='platform_bridges',
+                 description='ROS<->AMQP bridges',
+                 version='0.1.0',
+                 rosdeps=['rospy', 'std_msgs', 'sensor_msgs']):
+        self.name = name
+        self.description = description
+        self.version = version
+        self.rosdeps = rosdeps
+
+
+class Generator(object):
     def __init__(self):
         self.this_dir = dirname(__file__)
         self.gen_dir = join(self.this_dir, 'gen')
@@ -81,53 +94,93 @@ class Generator(object):
 
 
 class RosAMQPBridgesGen(Generator):
-
     def __init__(self):
         Generator.__init__(self)
 
     def generate(self, model):
         broker = model.amqpBroker
         topics = broker.topics
-        for topic in topics:
-            print(topic)
+        ros_sys = model.rosSystem
 
-        return
         self.logger.debug('[*] - AMQP Broker: {}:{}'.format(
             broker.ip, broker.port))
         self._mkdir(self.gen_dir)
 
         self._init_tpl_engine()
 
+        pkg_cfg = ROSPackageCfg()
+
         pkg_root = self._create_ros_py_pkg(pkg_cfg)
 
         bridge_tpl = join(self.tpl_dir, 'ros_amqp_pub_bridge.tpl.py')
         tpl = self.jinja_env.get_template(bridge_tpl)
 
-        for amqppub in model.amqppubs:
+        for conn in model.rosPubConnectors:
+            ros_pub = conn.rosPub
+            amqp_topic = conn.amqpTopic
             # For each amqppub generate file
-            name = amqppub.rosTopic.replace('/', '_')
+            name = ros_pub.topic.uri.replace('/', '_')
             if name[0] == '_':
                 # Remove first dot if exists
                 name = name[1:]
             gen_path = join(pkg_root, 'scripts', '{}_bridge.py'.format(name))
             # Append the name of the ROS node
-            amqppub.ros_node_name = '{}_bridge'.format(name)
+            ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
-                f.write(tpl.render(amqp_broker=broker, bridge=amqppub))
+                f.write(
+                    tpl.render(
+                        amqp_broker=broker,
+                        rospub=ros_pub,
+                        amqp_topic=amqp_topic,
+                        conn_name=conn.name.replace('_', '')))
             # Give execution permissions to the generated python file
             chmod(gen_path, 509)
 
-            self._log_gen_pub(amqppub, gen_path)
-        # Generate launch file
-        self._gen_launch_file(pkg_cfg, model. amqppubs)
+            self._log_gen_pub(conn, gen_path)
 
-    def _log_gen_pub(self, amqppub, pkg_root):
+        bridge_tpl = join(self.tpl_dir, 'ros_amqp_sub_bridge.tpl.py')
+        tpl = self.jinja_env.get_template(bridge_tpl)
+        for conn in model.rosSubConnectors:
+            ros_sub = conn.rosSub
+            amqp_topic = conn.amqpTopic
+            # For each amqppub generate file
+            name = ros_sub.topic.uri.replace('/', '_')
+            if name[0] == '_':
+                # Remove first dot if exists
+                name = name[1:]
+            gen_path = join(pkg_root, 'scripts', '{}_bridge.py'.format(name))
+            # Append the name of the ROS node
+            ros_node_name = '{}_bridge'.format(name)
+            with open(gen_path, 'w') as f:
+                f.write(
+                    tpl.render(
+                        amqp_broker=broker,
+                        rossub=ros_sub,
+                        amqp_topic=amqp_topic,
+                        conn_name=conn.name.replace('_', '')))
+            # Give execution permissions to the generated python file
+            chmod(gen_path, 509)
+
+            self._log_gen_sub(conn, gen_path)
+
+        # Generate launch file
+        #  self._gen_launch_file(pkg_cfg, model.rosPubConnectors)
+
+    def _log_gen_pub(self, conn, pkg_root):
+        ros_pub = conn.rosPub
+        amqp_topic = conn.amqpTopic
         self.logger.debug(
-            '[*] Generated ROS Publisher Bridge:\n' +
-            '- Destination: {}\n'.format(pkg_root) +
-            '- Topic Map: {} -> {}.{}'.format(
-                amqppub.rosTopic, amqppub.amqpTopicNamespace,
-                amqppub.amqpTopic))
+            '[*] Generated ROS Publisher -> AMQP connector:\n' +
+            '- Destination: {}\n'.format(pkg_root) + '- Topic Map: {} -> {}.{}'
+            .format(ros_pub.topic.uri, amqp_topic.namespace, amqp_topic.uri))
+
+    def _log_gen_sub(self, conn, pkg_root):
+        ros_sub = conn.rosSub
+        amqp_topic = conn.amqpTopic
+        self.logger.debug(
+            '[*] Generated ROS Publisher -> AMQP connector:\n' +
+            '- Destination: {}\n'.format(pkg_root) + '- Topic Map: {} -> {}.{}'
+            .format(ros_sub.topic.uri, amqp_topic.namespace, amqp_topic.uri))
 
 
 if __name__ == '__main__':

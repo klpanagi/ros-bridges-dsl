@@ -1,26 +1,29 @@
 #!/usr/bin/env python2
 
 import rospy
-from {{ bridge.rosMessagePackage }}.msg import {{ bridge.rosMessageType }}
+
+{% set msgPkg = rospub.topic.msgType.split('/')[0] %}
+{% set msgType = rospub.topic.msgType.split('/')[1] %}
+from {{ msgPkg }}.msg import {{ msgType }}
 
 import amqp_common
 from rosconversions import ros_msg_to_dict
 
 
-class {{ bridge.name }}Bridge(object):
+class {{ conn_name }}Bridge(object):
     """TODO!"""
 
     def __init__(self):
-        self.ros_topic = "{{ bridge.rosTopic }}"
-        self.amqp_exchange = "{{ bridge.amqpExchange }}"
-        self.amqp_topic = "{{ bridge.amqpTopic }}"
-        self.amqp_topic_namespace = "{{ bridge.amqpTopicNamespace }}"
+        self.ros_topic = "{{ rospub.topic.uri }}"
+        self.amqp_exchange = "{{ amqp_topic.exchange }}"
+        self.amqp_topic = "{{ amqp_topic.uri }}"
+        self.amqp_topic_namespace = "{{ amqp_topic.namespace }}"
         self.amqp_broker_ip = "{{ amqp_broker.ip }}"
         self.amqp_broker_port = "{{ amqp_broker.port }}"
-        self.amqp_broker_vhost = "{{ amqp_broker.vhost }}"
+        self.amqp_broker_vhost = "{{ amqp_topic.vhost }}"
         self.username = "{{ amqp_broker.username }}"
         self.password = "{{ amqp_broker.password }}"
-        self.ros_message_type = {{ bridge.rosMessageType }}
+        self.ros_message_type = {{ msgType }}
         self.ros_node_name = self.__class__.__name__
         self._debug = False
 
@@ -28,7 +31,8 @@ class {{ bridge.name }}Bridge(object):
     def debug(self):
         return self._debug
 
-    @debug.setter(self, val):
+    @debug.setter
+    def debug(self, val):
         self._debug = val
 
     def run(self):
@@ -45,8 +49,11 @@ class {{ bridge.name }}Bridge(object):
                          self._ros_callback)
 
     def _ros_callback(self, msg):
-        data = ros_msg_to_dict(msg)
-        self._publish(data)
+        try:
+            data = ros_msg_to_dict(msg)
+            self._publish(data)
+        except Exception as exc:
+            rospy.lowarn()
 
     def _init_platform_publisher(self):
         topic = '{}.{}'.format(self.amqp_topic_namespace, self.amqp_topic)
@@ -67,5 +74,5 @@ class {{ bridge.name }}Bridge(object):
 
 
 if __name__ == '__main__':
-    br = {{ bridge.name }}Bridge()
+    br = {{ conn_name }}Bridge()
     br.run()
