@@ -3,6 +3,7 @@ RosAmqpConnectorsMetamodel:
     rosSystem*=ROSSystem
     rosPubConnectors*=ROSPubConnector
     rosSubConnectors*=ROSSubConnector
+    rosServiceConnectors*=ROSServiceConnector
 ;
 
 AMQPBroker:
@@ -15,11 +16,24 @@ AMQPBroker:
         'section #topics'
             topics*=AMQPTopic
         'endsection'
+
+        'section #rpc'
+            topics*=AMQPRPC
+        'endsection'
 	'}'
 ;
 
 AMQPTopic:
 	'AMQPTopic' name=ID '=> {'
+		'exchange =' exchange=STRING ';'
+		'uri =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
+		'vhost =' vhost=STRING ';'
+	'}'
+;
+
+AMQPRPC:
+	'AMQPRPC' name=ID '=> {'
 		'exchange =' exchange=STRING ';'
 		'uri =' uri=STRING ';'
 		'namespace =' namespace=STRING ';'
@@ -35,6 +49,10 @@ ROSSubConnector:
     'ROSSubConnector' name=ID amqpTopic=[AMQPTopic] '->' rosSub=[ROSSubscriber] ';'
 ;
 
+ROSServiceConnector:
+    'ROSServiceConnector' name=ID rosService=[ROSService] '->' amqpRPC=[AMQPRPC] ';'
+;
+
 ROSSystem:
    	'ROSSystem' '=> {'
         ('section #publishers'
@@ -47,6 +65,10 @@ ROSSystem:
 
         ('section #topics'
             topics*=ROSTopic
+        'endsection')?
+
+        ('section #services'
+            topics*=ROSService
         'endsection')?
     '}'
 ;
@@ -74,6 +96,15 @@ ROSTopic:
         'msgType =' msgType=STRING ';'
     '}'
 ;
+
+ROSService:
+    'ROSService' name=ID '=> {'
+        'uri =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
+        'srvType =' srvType=STRING ';'
+    '}'
+;
+
 
 Comment:
   /\/\/.*$/

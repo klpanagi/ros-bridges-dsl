@@ -111,7 +111,36 @@ class RosAMQPBridgesGen(Generator):
         pkg_cfg = ROSPackageCfg()
 
         pkg_root = self._create_ros_py_pkg(pkg_cfg)
+        self._gen_pubConnectors(model, pkg_root)
+        self._gen_subConnectors(model, pkg_root)
+        self._gen_rpcConnectors(model, pkg_root)
 
+    def _gen_rpcConnectors(self, model, dest_pkg):
+        bridge_tpl = join(self.tpl_dir, 'ros_amqp_rpc_bridge.tpl.py')
+        tpl = self.jinja_env.get_template(bridge_tpl)
+
+        for conn in model.rosServiceConnectors:
+            ros_service = conn.rosService
+            amqp_rpc = conn.amqpRPC
+            # For each amqppub generate file
+            name = ros_service.uri.replace('/', '_')
+            if name[0] == '_':
+                # Remove first dot if exists
+                name = name[1:]
+            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
+            # Append the name of the ROS node
+            ros_node_name = '{}_bridge'.format(name)
+            with open(gen_path, 'w') as f:
+                f.write(
+                    tpl.render(
+                        amqp_broker=model.amqpBroker,
+                        ros_service=ros_service,
+                        amqp_rpc=amqp_rpc,
+                        conn_name=conn.name.replace('_', '')))
+            # Give execution permissions to the generated python file
+            chmod(gen_path, 509)
+
+    def _gen_pubConnectors(self, model, dest_pkg):
         bridge_tpl = join(self.tpl_dir, 'ros_amqp_pub_bridge.tpl.py')
         tpl = self.jinja_env.get_template(bridge_tpl)
 
@@ -123,13 +152,13 @@ class RosAMQPBridgesGen(Generator):
             if name[0] == '_':
                 # Remove first dot if exists
                 name = name[1:]
-            gen_path = join(pkg_root, 'scripts', '{}_bridge.py'.format(name))
+            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
             # Append the name of the ROS node
             ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
-                        amqp_broker=broker,
+                        amqp_broker=model.amqpBroker,
                         rospub=ros_pub,
                         amqp_topic=amqp_topic,
                         conn_name=conn.name.replace('_', '')))
@@ -138,8 +167,10 @@ class RosAMQPBridgesGen(Generator):
 
             self._log_gen_pub(conn, gen_path)
 
+    def _gen_subConnectors(self, model, dest_pkg):
         bridge_tpl = join(self.tpl_dir, 'ros_amqp_sub_bridge.tpl.py')
         tpl = self.jinja_env.get_template(bridge_tpl)
+
         for conn in model.rosSubConnectors:
             ros_sub = conn.rosSub
             amqp_topic = conn.amqpTopic
@@ -148,13 +179,13 @@ class RosAMQPBridgesGen(Generator):
             if name[0] == '_':
                 # Remove first dot if exists
                 name = name[1:]
-            gen_path = join(pkg_root, 'scripts', '{}_bridge.py'.format(name))
+            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
             # Append the name of the ROS node
             ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
-                        amqp_broker=broker,
+                        amqp_broker=model.amqpBroker,
                         rossub=ros_sub,
                         amqp_topic=amqp_topic,
                         conn_name=conn.name.replace('_', '')))
@@ -190,6 +221,5 @@ if __name__ == '__main__':
     else:
         meta_model = metamodel_from_file(join(this_folder, 'metamodel2.tx'))
         model = meta_model.model_from_file(sys.argv[1])
-        print(model)
         gen = RosAMQPBridgesGen()
         gen.generate(model)
