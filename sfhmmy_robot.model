@@ -18,27 +18,26 @@ AMQPBroker => {
       namespace = 'robot_1';
       vhost = '/';
     }
-
   endsection
 
   section #rpc
     AMQPRPC GoToNextNodeAMQPRPC => {
       exchange = '';
-      uri = 'behaviour.motion.go_to_next_node';
+      uri = 'go_to_next_node';
       namespace = 'robot_1';
       vhost = '/';
     }
 
     AMQPRPC RotateLeftAMQPRPC => {
       exchange = '';
-      uri = 'behaviour.motion.rotate_left';
+      uri = 'rotate_left';
       namespace = 'robot_1';
       vhost = '/';
     }
 
     AMQPRPC RotateRightAMQPRPC => {
       exchange = '';
-      uri = 'behaviour.motion.rotate_right';
+      uri = 'rotate_right';
       namespace = 'robot_1';
       vhost = '/';
     }
@@ -89,6 +88,12 @@ ROSSystem => {
 
     ROSService RotateRightROSService => {
       uri = '/behaviour/control/motion/base/rotate_right';
+      namespace = '';
+      srvType = 'std_srvs/Trigger';
+    }
+
+    ROSService RotateRightROSService => {
+    uri = '/behaviour/control/motion/base/set_path';
       namespace = '';
       srvType = 'std_srvs/Trigger';
     }
