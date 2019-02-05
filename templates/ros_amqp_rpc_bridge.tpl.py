@@ -6,53 +6,61 @@ import rospy
 
 {% set srvPkg = ros_service.srvType.split('/')[0] %}
 {% set srvType = ros_service.srvType.split('/')[1] %}
-from {{ srvPkg }}.srv import {{ srvType }}
+from {{ srvPkg }}.srv import {{ srvType }}, {{ srvType }}Request, {{ srvType }}Response
 
-from rosconversions import ros_srv_resp_to_dict
+from rosconversions import ros_srv_resp_to_dict, dict_to_ros_srv_request
 
 
-class {{ conn_name }}Bridge(object):
+class {{ conn_name }}(object):
 
     def __init__(self):
-        self.ros_service_uri = "{{ ros_service.uri }}"
-        self.amqp_exchange = "{{ amqp_rpc.exchange }}"
-        self.amqp_rpc_name = "{{ amqp_rpc.uri }}"
-        self.amqp_topic_namespace = "{{ amqp_rpc.namespace }}"
-        self.amqp_broker_ip = "{{ amqp_broker.ip }}"
-        self.amqp_broker_port = "{{ amqp_broker.port }}"
-        self.amqp_broker_vhost = "{{ amqp_rpc.vhost }}"
-        self.username = "{{ amqp_broker.username }}"
-        self.password = "{{ amqp_broker.password }}"
+        self.ros_service_uri = '{{ ros_service.uri }}'
+        self.amqp_exchange = '{{ amqp_rpc.exchange }}'
+        self.amqp_rpc_name = '{{ amqp_rpc.uri }}'
+        self.amqp_rpc_namespace = '{{ amqp_rpc.namespace }}'
+        self.amqp_broker_ip = '{{ amqp_broker.ip }}'
+        self.amqp_broker_port = '{{ amqp_broker.port }}'
+        self.amqp_broker_vhost = '{{ amqp_broker.vhost }}'
+        self.username = '{{ amqp_broker.username }}'
+        self.password = '{{ amqp_broker.password }}'
 
-        self.rpc_name = self.amqp_namespace + \
-            self.ros_service_uri.replace('/', '.')
+        if self.amqp_rpc_namespace:
+            self.rpc_name = '{}.{}'.format(self.amqp_rpc_namespace,
+                                           self.amqp_rpc_name)
+        else:
+            self.rpc_name = self.amqp_rpc_name
         self.ros_service_type = {{ srvType }}
+        self.ros_srv_type_str = '{{ ros_service.srvType }}'
         self.ros_node_name = self.__class__.__name__
+
+        self.conn_params = amqp_common.ConnectionParameters(
+            vhost=self.amqp_broker_vhost,
+            host=self.amqp_broker_ip,
+            port=self.amqp_broker_port)
+        self.conn_params.credentials = amqp_common.Credentials(
+            self.username, self.password)
+        self.conn = amqp_common.SharedConnection(self.conn_params)
 
     def _init_rpc_server(self):
         self.rpc_server = amqp_common.RpcServer(
-            self.amqp_rpc_name, on_request=self._rpc_callback,
-            connection_params=amqp_common.ConnectionParameters(
-                host=self.amqp_broker_ip,
-                port=self.amqp_broker_port),
-            creds=amqp_common.Credentials(self.username,
-                                          self.password))
+            self.rpc_name, on_request=self._rpc_callback,
+            connection=self.conn)
 
     def _init_ros_service(self):
+        rospy.init_node(self.ros_node_name)
+        rospy.loginfo('Waiting for ROS Service {} ...'.format(self.ros_service_uri))
         rospy.wait_for_service(self.ros_service_uri)
         self.ros_srv = rospy.ServiceProxy(
             self.ros_service_uri, self.ros_service_type)
+        rospy.loginfo('ROS Service client ready')
 
-    def _go_to_next_node(self):
+    def _rpc_callback(self, msg, meta):
+        """."""
         try:
-            resp = self.ros_srv()
-            return resp
+            srv_req = dict_to_ros_srv_request(self.ros_srv_type_str, msg)
+            resp = self.ros_srv(srv_req)
         except rospy.ServiceException as exc:
             print('Service call failed: {}'.format(exc))
-
-    def _rpc_callback(self):
-        """."""
-        resp = self._go_to_next_node()
         data = ros_srv_resp_to_dict(resp)
         return data
 
@@ -60,9 +68,10 @@ class {{ conn_name }}Bridge(object):
         """Start the bridge."""
         self._init_rpc_server()
         self._init_ros_service()
-        self.rpc_server.run()
-
+        self.rpc_server.run_threaded()
+        while not rospy.is_shutdown():
+            rospy.sleep(0.001)
 
 if __name__ == "__main__":
-    br = GoToNextNodeBridge()
+    br = {{ conn_name }}()
     br.run()

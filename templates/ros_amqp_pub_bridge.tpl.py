@@ -10,7 +10,7 @@ import amqp_common
 from rosconversions import ros_msg_to_dict
 
 
-class {{ conn_name }}Bridge(object):
+class {{ conn_name }}(object):
     """TODO!"""
 
     def __init__(self):
@@ -20,7 +20,7 @@ class {{ conn_name }}Bridge(object):
         self.amqp_topic_namespace = "{{ amqp_topic.namespace }}"
         self.amqp_broker_ip = "{{ amqp_broker.ip }}"
         self.amqp_broker_port = "{{ amqp_broker.port }}"
-        self.amqp_broker_vhost = "{{ amqp_topic.vhost }}"
+        self.amqp_broker_vhost = "{{ amqp_broker.vhost }}"
         self.username = "{{ amqp_broker.username }}"
         self.password = "{{ amqp_broker.password }}"
         self.ros_message_type = {{ msgType }}
@@ -74,5 +74,5 @@ class {{ conn_name }}Bridge(object):
 
 
 if __name__ == '__main__':
-    br = {{ conn_name }}Bridge()
+    br = {{ conn_name }}()
     br.run()

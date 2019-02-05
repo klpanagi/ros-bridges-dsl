@@ -3,21 +3,27 @@ AMQPBroker => {
   port = "5672";
   username = 'robot_1';
   password = 'r0b0t1';
+  vhost = '/';
 
   section #topics
     AMQPTopic SonarFrontAMQPTopic => {
       exchange = 'amq.topic';
       uri = 'sensor.range.sonar.front';
       namespace = 'robot_1';
-      vhost = '/';
     }
 
     AMQPTopic MotionBaseMotorsAMQPTopic => {
       exchange = 'amq.topic';
       uri = 'effector.motion.base.motors';
       namespace = 'robot_1';
-      vhost = '/';
     }
+
+    AMQPTopic PoseUpdateAMQPTopic => {
+      exchange = 'amq.topic';
+      uri = 'pose_update';
+      namespace = 'robot_1';
+    }
+
   endsection
 
   section #rpc
@@ -25,22 +31,38 @@ AMQPBroker => {
       exchange = '';
       uri = 'go_to_next_node';
       namespace = 'robot_1';
-      vhost = '/';
     }
 
     AMQPRPC RotateLeftAMQPRPC => {
       exchange = '';
       uri = 'rotate_left';
       namespace = 'robot_1';
-      vhost = '/';
     }
 
     AMQPRPC RotateRightAMQPRPC => {
       exchange = '';
       uri = 'rotate_right';
       namespace = 'robot_1';
-      vhost = '/';
     }
+
+    AMQPRPC SetPathAMQPRPC => {
+      exchange = '';
+      uri = 'set_path';
+      namespace = 'robot_1';
+    }
+
+    AMQPRPC ImmobilizeAMQPRPC => {
+      exchange = '';
+      uri = 'immobilize';
+      namespace = 'robot_1';
+    }
+
+    AMQPRPC RobotReadyAMQPRPC => {
+      exchange = '';
+      uri = 'ready';
+      namespace = 'robot_1';
+    }
+
   endsection
 }
 
@@ -49,13 +71,16 @@ ROSSystem => {
     ROSPublisher SonarFrontROSPub => {
       topic = SonarFrontROSTopic;
     }
+
+    ROSPublisher PoseUpdateROSPub => {
+      topic = PoseUpdateROSTopic;
+    }
   endsection
 
   section #subscribers
     ROSSubscriber MotionBaseMotorsROSSub => {
       topic = MotionBaseMotorsROSTopic;
     }
-
   endsection
 
   section #topics
@@ -63,14 +88,19 @@ ROSSystem => {
       uri = '/sensor/range/sonar/front';
       namespace = '';
       msgType = 'sensor_msgs/Range';
-    } 
+    }
 
     ROSTopic MotionBaseMotorsROSTopic => {
       uri = '/effector/motion/base/motors';
       namespace = '';
       msgType = 'robot_communication/Motors';
-    } 
+    }
 
+    ROSTopic PoseUpdateROSTopic => {
+      uri = '/behaviour/control/motion/base/pose_update';
+      namespace = '';
+      msgType = 'robot_communication/PoseUpdate';
+    } 
   endsection
 
   section #services
@@ -92,15 +122,28 @@ ROSSystem => {
       srvType = 'std_srvs/Trigger';
     }
 
-    ROSService RotateRightROSService => {
-    uri = '/behaviour/control/motion/base/set_path';
+    ROSService SetPathROSService => {
+      uri = '/behaviour/control/motion/base/set_path';
       namespace = '';
-      srvType = 'std_srvs/Trigger';
+      srvType = 'robot_communication/SetPath';
     }
+
+    ROSService ImmobilizeROSService => {
+      uri = '/behaviour/control/motion/base/immobilize';
+      namespace = '';
+      srvType = 'robot_communication/Immobilize';
+    }
+
+    ROSService RobotReadyROSService => {
+      uri = '/behaviour/control/motion/base/ready';
+      namespace = '';
+      srvType = 'robot_communication/RobotReady';
+    }
+
   endsection
 }
 
-ROSPubConnector SonarFrontConnector SonarFrontROSPub -> SonarFrontAMQPTopic;
-ROSSubConnector MotionBaseMotorsConnector MotionBaseMotorsAMQPTopic -> MotionBaseMotorsROSSub;
-ROSServiceConnector GoToNextNodeConnector GoToNextNodeROSService -> GoToNextNodeAMQPRPC;
-ROSServiceConnector RotateLeftConnector RotateLeftROSService -> RotateLeftAMQPRPC;
+ROSPubConnector PoseUpdateConnector PoseUpdateROSPub -> PoseUpdateAMQPTopic;
+ROSServiceConnector SetPathConnector SetPathROSService -> SetPathAMQPRPC;
+ROSServiceConnector ImmobilizeConnector ImmobilizeROSService -> ImmobilizeAMQPRPC;
+ROSServiceConnector RobotReadyConnector RobotReadyROSService -> RobotReadyAMQPRPC;

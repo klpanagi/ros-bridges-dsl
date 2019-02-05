@@ -17,7 +17,7 @@ class ROSPackageCfg(object):
 
     def __init__(self,
                  name='platform_bridges',
-                 description='ROS<->AMQP bridges',
+                 description='ROS-AMQP bridges',
                  version='0.1.0',
                  rosdeps=['rospy', 'std_msgs', 'sensor_msgs']):
         self.name = name
@@ -83,14 +83,14 @@ class Generator(object):
 
         return pkg_root
 
-    def _gen_launch_file(self, package, amqppubs, launcher_name='launcher'):
+    def _gen_launch_file(self, package, bridges, launcher_name='launcher'):
         ros_py_pkg_tpl = join(self.tpl_dir, 'ros_py_pkg_tpl')
         pkg_root = join(self.gen_dir, package.name)
         launch_tpl = join(ros_py_pkg_tpl, 'launcher.tpl.launch')
         tpl = self.jinja_env.get_template(launch_tpl)
         gen_path = join(pkg_root, 'launch', '{}.launch'.format(launcher_name))
         with open(gen_path, 'w') as f:
-            f.write(tpl.render(package=package, amqppubs=amqppubs))
+            f.write(tpl.render(package=package, bridges=bridges))
 
 
 class RosAMQPBridgesGen(Generator):
@@ -114,6 +114,9 @@ class RosAMQPBridgesGen(Generator):
         self._gen_pubConnectors(model, pkg_root)
         self._gen_subConnectors(model, pkg_root)
         self._gen_rpcConnectors(model, pkg_root)
+        br = model.rosServiceConnectors + model.rosPubConnectors + \
+            model.rosSubConnectors
+        self._gen_launch_file(pkg_cfg, br)
 
     def _gen_rpcConnectors(self, model, dest_pkg):
         bridge_tpl = join(self.tpl_dir, 'ros_amqp_rpc_bridge.tpl.py')
@@ -123,13 +126,10 @@ class RosAMQPBridgesGen(Generator):
             ros_service = conn.rosService
             amqp_rpc = conn.amqpRPC
             # For each amqppub generate file
-            name = ros_service.uri.replace('/', '_')
-            if name[0] == '_':
-                # Remove first dot if exists
-                name = name[1:]
-            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
+            node_exec_name = conn.name.lower()
+            gen_path = join(dest_pkg, 'scripts', '{}.py'.format(
+                node_exec_name))
             # Append the name of the ROS node
-            ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
@@ -145,16 +145,13 @@ class RosAMQPBridgesGen(Generator):
         tpl = self.jinja_env.get_template(bridge_tpl)
 
         for conn in model.rosPubConnectors:
+            # For each amqppub generate file
             ros_pub = conn.rosPub
             amqp_topic = conn.amqpTopic
-            # For each amqppub generate file
-            name = ros_pub.topic.uri.replace('/', '_')
-            if name[0] == '_':
-                # Remove first dot if exists
-                name = name[1:]
-            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
+            node_exec_name = conn.name.lower()
+            gen_path = join(dest_pkg, 'scripts', '{}.py'.format(
+                node_exec_name))
             # Append the name of the ROS node
-            ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
@@ -172,16 +169,13 @@ class RosAMQPBridgesGen(Generator):
         tpl = self.jinja_env.get_template(bridge_tpl)
 
         for conn in model.rosSubConnectors:
+            # For each amqpsub generate file
             ros_sub = conn.rosSub
             amqp_topic = conn.amqpTopic
-            # For each amqppub generate file
-            name = ros_sub.topic.uri.replace('/', '_')
-            if name[0] == '_':
-                # Remove first dot if exists
-                name = name[1:]
-            gen_path = join(dest_pkg, 'scripts', '{}_bridge.py'.format(name))
+            node_exec_name = conn.name.lower()
+            gen_path = join(dest_pkg, 'scripts', '{}.py'.format(
+                node_exec_name))
             # Append the name of the ROS node
-            ros_node_name = '{}_bridge'.format(name)
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
@@ -193,9 +187,6 @@ class RosAMQPBridgesGen(Generator):
             chmod(gen_path, 509)
 
             self._log_gen_sub(conn, gen_path)
-
-        # Generate launch file
-        #  self._gen_launch_file(pkg_cfg, model.rosPubConnectors)
 
     def _log_gen_pub(self, conn, pkg_root):
         ros_pub = conn.rosPub
@@ -219,7 +210,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("[*] - Usage: python {} <model>".format(sys.argv[0]))
     else:
-        meta_model = metamodel_from_file(join(this_folder, 'metamodel2.tx'))
+        meta_model = metamodel_from_file(join(this_folder, 'ros-amqp-metamodel.tx'))
         model = meta_model.model_from_file(sys.argv[1])
         gen = RosAMQPBridgesGen()
         gen.generate(model)

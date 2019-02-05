@@ -12,6 +12,7 @@ AMQPBroker:
 		'port =' port=STRING ';'
 		'username =' username=STRING ';'
 		'password =' password=STRING ';'
+		'vhost =' vhost=STRING ';'
 
         'section #topics'
             topics*=AMQPTopic
@@ -28,7 +29,6 @@ AMQPTopic:
 		'exchange =' exchange=STRING ';'
 		'uri =' uri=STRING ';'
 		'namespace =' namespace=STRING ';'
-		'vhost =' vhost=STRING ';'
 	'}'
 ;
 
@@ -37,7 +37,6 @@ AMQPRPC:
 		'exchange =' exchange=STRING ';'
 		'uri =' uri=STRING ';'
 		'namespace =' namespace=STRING ';'
-		'vhost =' vhost=STRING ';'
 	'}'
 ;
 
