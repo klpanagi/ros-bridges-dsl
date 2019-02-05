@@ -1,6 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  {% for node in amqppubs %}
-  <node name="{{ node.ros_node_name }}" pkg="{{ package.name }}" type="{{ node.ros_node_name }}.py" output="screen"
+  {% for node in bridges %}
+    {% set node_name = node.name.lower() %}
+    {% set node_exec = node_name + '.py' %}
+    <node name="{{ node_name }}" pkg="{{ package.name }}" type="{{ node_exec }}" output="screen"
     respawn="true" respawn_delay="2" required="false"/>
   {% endfor %}
 </launch>

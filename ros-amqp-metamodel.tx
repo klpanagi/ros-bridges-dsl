@@ -1,8 +1,9 @@
 RosAmqpConnectorsMetamodel:
     amqpBroker=AMQPBroker
-    rosSubConnectors*=ROSSubConnector
-    rosPubConnectors*=ROSPubConnector
     rosSystem*=ROSSystem
+    rosPubConnectors*=ROSPubConnector
+    rosSubConnectors*=ROSSubConnector
+    rosServiceConnectors*=ROSServiceConnector
 ;
 
 AMQPBroker:
@@ -11,9 +12,14 @@ AMQPBroker:
 		'port =' port=STRING ';'
 		'username =' username=STRING ';'
 		'password =' password=STRING ';'
+		'vhost =' vhost=STRING ';'
 
         'section #topics'
             topics*=AMQPTopic
+        'endsection'
+
+        'section #rpc'
+            topics*=AMQPRPC
         'endsection'
 	'}'
 ;
@@ -21,18 +27,29 @@ AMQPBroker:
 AMQPTopic:
 	'AMQPTopic' name=ID '=> {'
 		'exchange =' exchange=STRING ';'
-		'topic =' topic=STRING ';'
+		'uri =' uri=STRING ';'
 		'namespace =' namespace=STRING ';'
-		'vhost =' vhost=STRING ';'
+	'}'
+;
+
+AMQPRPC:
+	'AMQPRPC' name=ID '=> {'
+		'exchange =' exchange=STRING ';'
+		'uri =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
 	'}'
 ;
 
 ROSPubConnector:
-    'connector' bridgeName=ID rosPub=[ROSPublisher] '=>' amqpTopic=[AMQPTopic] ';'
+    'ROSPubConnector' name=ID rosPub=[ROSPublisher] '->' amqpTopic=[AMQPTopic] ';'
 ;
 
 ROSSubConnector:
-    'connector' bridgeName=ID rosSub=[ROSSubscriber] '<=' amqpTopic=[AMQPTopic] ';'
+    'ROSSubConnector' name=ID amqpTopic=[AMQPTopic] '->' rosSub=[ROSSubscriber] ';'
+;
+
+ROSServiceConnector:
+    'ROSServiceConnector' name=ID rosService=[ROSService] '->' amqpRPC=[AMQPRPC] ';'
 ;
 
 ROSSystem:
@@ -48,13 +65,17 @@ ROSSystem:
         ('section #topics'
             topics*=ROSTopic
         'endsection')?
+
+        ('section #services'
+            topics*=ROSService
+        'endsection')?
     '}'
 ;
 
 ROSPublisher:
     'ROSPublisher' name=ID '=> {'
         'topic =' topic=[ROSTopic] ';'
-        'nodeName =' nodeName=STRING ';'
+        ('nodeName =' nodeName=STRING ';')?
         ('queueSize =' queueSize=INT ';')?
         ('latch =' latch=BOOL ';')?
     '}'
@@ -63,16 +84,26 @@ ROSPublisher:
 ROSSubscriber:
     'ROSSubscriber' name=ID '=> {'
         'topic =' topic=[ROSTopic] ';'
-        'nodeName =' nodeName=STRING ';'
+        ('nodeName =' nodeName=STRING ';')?
     '}'
 ;
 
 ROSTopic:
     'ROSTopic' name=ID '=> {'
-        'name =' uri=STRING ';'
+        'uri =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
         'msgType =' msgType=STRING ';'
     '}'
 ;
+
+ROSService:
+    'ROSService' name=ID '=> {'
+        'uri =' uri=STRING ';'
+		'namespace =' namespace=STRING ';'
+        'srvType =' srvType=STRING ';'
+    '}'
+;
+
 
 Comment:
   /\/\/.*$/

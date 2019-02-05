@@ -11,78 +11,69 @@
     edge[dir=black,arrowtail=empty]
 
 
-94394947557176 -> 94394949879928[arrowtail=diamond, dir=both, headlabel="amqpBroker "]
-94394947557176 -> 94394950076136[arrowtail=diamond, dir=both, headlabel="amqpTopics 0..*"]
-94394947557176 -> 94394950086616[arrowtail=diamond, dir=both, headlabel="rosSubConnectors 0..*"]
-94394947557176 -> 94394950081080[arrowtail=diamond, dir=both, headlabel="rosPubConnectors 0..*"]
-94394947557176 -> 94394950092152[arrowtail=diamond, dir=both, headlabel="rosPackages 0..*"]
-94394947557176 -> 94394950079080[arrowtail=diamond, dir=both, headlabel="rosNodes 0..*"]
-94394947557176 -> 94394947562120[arrowtail=diamond, dir=both, headlabel="rosPublishers 0..*"]
-94394947557176 -> 94394950097688[arrowtail=diamond, dir=both, headlabel="rosSubscribers 0..*"]
-94394947557176 -> 94394950103224[arrowtail=diamond, dir=both, headlabel="rosTopics 0..*"]
-94394947557176 -> 94394950109880[arrowtail=diamond, dir=both, headlabel="rosMasters 0..*"]
-94394947557176 -> 94394950115416[arrowtail=diamond, dir=both, headlabel="rosMessages 0..*"]
-94394947557176[ label="{MetaModel|}"]
+30700336[ label="{Comment|\\/\\/.*$}"]
 
-94394949879928 -> 94394950076136[headlabel="topics 0..*"]
-94394949879928[ label="{AMQPBroker|+ip:STRING\l+port:STRING\l+username:STRING\l+password:STRING\l}"]
+30585440 -> 30680160[headlabel="rosService "]
+30585440 -> 30537072[headlabel="amqpRPC "]
+30585440[ label="{ROSServiceConnector|+name:ID\l}"]
 
-94394950076136[ label="{AMQPTopic|+name:ID\l+exchange:STRING\l+topic:STRING\l+namespace:STRING\l+vhost:STRING\l}"]
+30517184[ label="{AMQPTopic|+name:ID\l+exchange:STRING\l+uri:STRING\l+namespace:STRING\l}"]
 
-94394950081080 -> 94394947562120[headlabel="rosPub "]
-94394950081080 -> 94394950076136[headlabel="amqpTopic "]
-94394950081080[ label="{ROSPubConnector|+bridgeName:ID\l}"]
+30570832 -> 30517184[headlabel="amqpTopic "]
+30570832 -> 30641952[headlabel="rosSub "]
+30570832[ label="{ROSSubConnector|+name:ID\l}"]
 
-94394950086616 -> 94394950097688[headlabel="rosSub "]
-94394950086616 -> 94394950076136[headlabel="amqpTopic "]
-94394950086616[ label="{ROSSubConnector|+bridgeName:ID\l}"]
+30557216 -> 30614224[headlabel="rosPub "]
+30557216 -> 30517184[headlabel="amqpTopic "]
+30557216[ label="{ROSPubConnector|+name:ID\l}"]
 
-94394950092152 -> 94394950079080[headlabel="nodes 0..*"]
-94394950092152 -> 94394950115416[headlabel="msgs 0..*"]
-94394950092152[ label="{ROSPackage|+name:ID\l+description:STRING\l+version:STRING\lrosdeps:list[STRING]\l}"]
+30469344 -> 30614224[arrowtail=diamond, dir=both, headlabel="publishers 0..*"]
+30469344 -> 30641952[arrowtail=diamond, dir=both, headlabel="subscribers 0..*"]
+30469344[ label="{ROSSystem|topics:list[OBJECT]\l}"]
 
-94394950079080 -> 94394947562120[headlabel="publishers 0..*"]
-94394950079080 -> 94394950097688[headlabel="subscribers 0..*"]
-94394950079080 -> 94394950109880[headlabel="rosMaster "]
-94394950079080[ label="{ROSNode|+name:ID\l+namespace:STRING\l+anonymous:BOOL\l}"]
+30614224 -> 30660272[headlabel="topic "]
+30614224[ label="{ROSPublisher|+name:ID\l+nodeName:STRING\l+queueSize:INT\l+latch:BOOL\l}"]
 
-94394947562120 -> 94394950103224[headlabel="topic "]
-94394947562120[ label="{ROSPublisher|+name:ID\l+queueSize:INT\l+latch:BOOL\l}"]
+30537072[ label="{AMQPRPC|+name:ID\l+exchange:STRING\l+uri:STRING\l+namespace:STRING\l}"]
 
-94394950097688 -> 94394950103224[headlabel="topic "]
-94394950097688[ label="{ROSSubscriber|+name:ID\l}"]
+30470304 -> 30485328[arrowtail=diamond, dir=both, headlabel="amqpBroker "]
+30470304 -> 30469344[arrowtail=diamond, dir=both, headlabel="rosSystem 0..*"]
+30470304 -> 30557216[arrowtail=diamond, dir=both, headlabel="rosPubConnectors 0..*"]
+30470304 -> 30570832[arrowtail=diamond, dir=both, headlabel="rosSubConnectors 0..*"]
+30470304 -> 30585440[arrowtail=diamond, dir=both, headlabel="rosServiceConnectors 0..*"]
+30470304[ label="{RosAmqpConnectorsMetamodel|}"]
 
-94394950103224 -> 94394950115416[headlabel="msg "]
-94394950103224[ label="{ROSTopic|+name:ID\l+uri:STRING\l}"]
+30485328[ label="{AMQPBroker|+ip:STRING\l+port:STRING\l+username:STRING\l+password:STRING\l+vhost:STRING\ltopics:list[OBJECT]\l}"]
 
-94394950109880[ label="{ROSMaster|+name:ID\l+uri:STRING\l}"]
+30680160[ label="{ROSService|+name:ID\l+uri:STRING\l+namespace:STRING\l+srvType:STRING\l}"]
 
-94394950115416[ label="{ROSMessage|+name:ID\l}"]
+30660272[ label="{ROSTopic|+name:ID\l+uri:STRING\l+namespace:STRING\l+msgType:STRING\l}"]
 
-94394950120952[ label="{Comment|\\/\\/.*$}"]
+30641952 -> 30660272[headlabel="topic "]
+30641952[ label="{ROSSubscriber|+name:ID\l+nodeName:STRING\l}"]
 
-94394949874648[ label="{ID|}"]
+30248512[ label="{*OBJECT|}"]
+30248512 -> 30242736 [dir=back]
 
-94394949881928[ label="{STRING|}"]
+28586320[ label="{STRING|}"]
 
-94394949886872[ label="{BOOL|}"]
+30242736[ label="{BASETYPE|}"]
+30242736 -> 30236176 [dir=back]
+30242736 -> 30218848 [dir=back]
+30242736 -> 29767712 [dir=back]
+30242736 -> 28586320 [dir=back]
 
-94394949892920[ label="{INT|}"]
+30224624[ label="{INT|}"]
 
-94394947559176[ label="{FLOAT|}"]
+30230400[ label="{FLOAT|}"]
 
-94394947564120[ label="{NUMBER|}"]
-94394947564120 -> 94394947559176 [dir=back]
-94394947564120 -> 94394949892920 [dir=back]
+30236176[ label="{NUMBER|}"]
+30236176 -> 30230400 [dir=back]
+30236176 -> 30224624 [dir=back]
 
-94394949917384[ label="{BASETYPE|}"]
-94394949917384 -> 94394947564120 [dir=back]
-94394949917384 -> 94394949886872 [dir=back]
-94394949917384 -> 94394949874648 [dir=back]
-94394949917384 -> 94394949881928 [dir=back]
+30218848[ label="{BOOL|}"]
 
-94394949922328[ label="{*OBJECT|}"]
-94394949922328 -> 94394949917384 [dir=back]
+29767712[ label="{ID|}"]
 
 
 }

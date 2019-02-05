@@ -2,7 +2,7 @@
 
 
 if [[ "${1}" == "" ]]; then
-  METAMODEL_FILE="metamodel.tx"
+  METAMODEL_FILE="ros-amqp-metamodel.tx"
 else
   METAMODEL_FILE=${1}
 fi
