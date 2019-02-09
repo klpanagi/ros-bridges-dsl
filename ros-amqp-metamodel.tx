@@ -13,6 +13,7 @@ AMQPBroker:
 		'username =' username=STRING ';'
 		'password =' password=STRING ';'
 		'vhost =' vhost=STRING ';'
+        'namespace = ' namespace=STRING ';'
 
         'section #topics'
             topics*=AMQPTopic
@@ -28,7 +29,6 @@ AMQPTopic:
 	'AMQPTopic' name=ID '=> {'
 		'exchange =' exchange=STRING ';'
 		'uri =' uri=STRING ';'
-		'namespace =' namespace=STRING ';'
 	'}'
 ;
 
@@ -36,7 +36,6 @@ AMQPRPC:
 	'AMQPRPC' name=ID '=> {'
 		'exchange =' exchange=STRING ';'
 		'uri =' uri=STRING ';'
-		'namespace =' namespace=STRING ';'
 	'}'
 ;
 
@@ -91,7 +90,6 @@ ROSSubscriber:
 ROSTopic:
     'ROSTopic' name=ID '=> {'
         'uri =' uri=STRING ';'
-		'namespace =' namespace=STRING ';'
         'msgType =' msgType=STRING ';'
     '}'
 ;
@@ -99,7 +97,6 @@ ROSTopic:
 ROSService:
     'ROSService' name=ID '=> {'
         'uri =' uri=STRING ';'
-		'namespace =' namespace=STRING ';'
         'srvType =' srvType=STRING ';'
     '}'
 ;

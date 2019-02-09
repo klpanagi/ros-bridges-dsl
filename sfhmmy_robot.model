@@ -3,25 +3,23 @@ AMQPBroker => {
   port = "5672";
   username = 'robot_1';
   password = 'r0b0t1';
-  vhost = '/';
+  vhost = '/sfhmmy';
+  namespace = 'robot_1';
 
   section #topics
     AMQPTopic SonarFrontAMQPTopic => {
       exchange = 'amq.topic';
       uri = 'sensor.range.sonar.front';
-      namespace = 'robot_1';
     }
 
     AMQPTopic MotionBaseMotorsAMQPTopic => {
       exchange = 'amq.topic';
       uri = 'effector.motion.base.motors';
-      namespace = 'robot_1';
     }
 
     AMQPTopic PoseUpdateAMQPTopic => {
       exchange = 'amq.topic';
       uri = 'pose_update';
-      namespace = 'robot_1';
     }
 
   endsection
@@ -30,37 +28,31 @@ AMQPBroker => {
     AMQPRPC GoToNextNodeAMQPRPC => {
       exchange = '';
       uri = 'go_to_next_node';
-      namespace = 'robot_1';
     }
 
     AMQPRPC RotateLeftAMQPRPC => {
       exchange = '';
       uri = 'rotate_left';
-      namespace = 'robot_1';
     }
 
     AMQPRPC RotateRightAMQPRPC => {
       exchange = '';
       uri = 'rotate_right';
-      namespace = 'robot_1';
     }
 
     AMQPRPC SetPathAMQPRPC => {
       exchange = '';
       uri = 'set_path';
-      namespace = 'robot_1';
     }
 
     AMQPRPC ImmobilizeAMQPRPC => {
       exchange = '';
       uri = 'immobilize';
-      namespace = 'robot_1';
     }
 
     AMQPRPC RobotReadyAMQPRPC => {
       exchange = '';
       uri = 'ready';
-      namespace = 'robot_1';
     }
 
   endsection
@@ -86,19 +78,16 @@ ROSSystem => {
   section #topics
     ROSTopic SonarFrontROSTopic => {
       uri = '/sensor/range/sonar/front';
-      namespace = '';
       msgType = 'sensor_msgs/Range';
     }
 
     ROSTopic MotionBaseMotorsROSTopic => {
       uri = '/effector/motion/base/motors';
-      namespace = '';
       msgType = 'robot_communication/Motors';
     }
 
     ROSTopic PoseUpdateROSTopic => {
       uri = '/behaviour/control/motion/base/pose_update';
-      namespace = '';
       msgType = 'robot_communication/PoseUpdate';
     } 
   endsection
@@ -106,37 +95,31 @@ ROSSystem => {
   section #services
     ROSService GoToNextNodeROSService => {
       uri = '/behaviour/control/motion/base/go_to_next_node';
-      namespace = '';
       srvType = 'std_srvs/Trigger';
     }
 
     ROSService RotateLeftROSService => {
       uri = '/behaviour/control/motion/base/rotate_left';
-      namespace = '';
       srvType = 'std_srvs/Trigger';
     }
 
     ROSService RotateRightROSService => {
       uri = '/behaviour/control/motion/base/rotate_right';
-      namespace = '';
       srvType = 'std_srvs/Trigger';
     }
 
     ROSService SetPathROSService => {
       uri = '/behaviour/control/motion/base/set_path';
-      namespace = '';
       srvType = 'robot_communication/SetPath';
     }
 
     ROSService ImmobilizeROSService => {
       uri = '/behaviour/control/motion/base/immobilize';
-      namespace = '';
       srvType = 'robot_communication/Immobilize';
     }
 
     ROSService RobotReadyROSService => {
       uri = '/behaviour/control/motion/base/ready';
-      namespace = '';
       srvType = 'robot_communication/RobotReady';
     }
 

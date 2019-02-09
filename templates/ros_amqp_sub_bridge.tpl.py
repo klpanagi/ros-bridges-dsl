@@ -17,7 +17,7 @@ class {{ conn_name }}(object):
         self.ros_topic = "{{ rossub.topic.uri }}"
         self.amqp_exchange = "{{ amqp_topic.exchange }}"
         self.amqp_topic = "{{ amqp_topic.uri }}"
-        self.amqp_topic_namespace = "{{ amqp_topic.namespace }}"
+        self.amqp_topic_namespace = "{{ amqp_broker.namespace }}"
         self.amqp_broker_ip = "{{ amqp_broker.ip }}"
         self.amqp_broker_port = "{{ amqp_broker.port }}"
         self.amqp_broker_vhost = "{{ amqp_broker.vhost }}"

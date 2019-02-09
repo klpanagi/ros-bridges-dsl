@@ -192,23 +192,21 @@ class RosAMQPBridgesGen(Generator):
         ros_pub = conn.rosPub
         amqp_topic = conn.amqpTopic
         self.logger.debug(
-            '[*] Generated ROS Publisher -> AMQP connector:\n' +
-            '- Destination: {}\n'.format(pkg_root) + '- Topic Map: {} -> {}.{}'
-            .format(ros_pub.topic.uri, amqp_topic.namespace, amqp_topic.uri))
+            '[*] Generated Connector: [ROS-Topic:{} -> AMQP-Topic:{}]\n'.format(
+                ros_pub.topic.uri, amqp_topic.uri))
 
     def _log_gen_sub(self, conn, pkg_root):
         ros_sub = conn.rosSub
         amqp_topic = conn.amqpTopic
         self.logger.debug(
-            '[*] Generated ROS Publisher -> AMQP connector:\n' +
-            '- Destination: {}\n'.format(pkg_root) + '- Topic Map: {} -> {}.{}'
-            .format(ros_sub.topic.uri, amqp_topic.namespace, amqp_topic.uri))
+            '[*] Generated Connector: [AMQP-Topic:{} -> ROS-Topic:{}]\n'.format(
+                amqp_topic.uri, ros_sub.topic.uri))
 
 
 if __name__ == '__main__':
     this_folder = dirname(__file__)
     if len(sys.argv) != 2:
-        print("[*] - Usage: python {} <model>".format(sys.argv[0]))
+        print('[*] - Usage: python {} <model>'.format(sys.argv[0]))
     else:
         meta_model = metamodel_from_file(join(this_folder, 'ros-amqp-metamodel.tx'))
         model = meta_model.model_from_file(sys.argv[1])
