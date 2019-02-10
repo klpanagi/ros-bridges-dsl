@@ -63,7 +63,7 @@ class {{ conn_name }}(object):
             srv_req = dict_to_ros_srv_request(self.ros_srv_type_str, msg)
             resp = self.ros_srv(srv_req)
         except rospy.ServiceException as exc:
-            print('ROS Service call failed: {}'.format(exc))
+            rospy.logerr('ROS Service call failed: {}'.format(exc))
             resp = {{ srvType }}Response()
         data = ros_srv_resp_to_dict(resp)
         return data
