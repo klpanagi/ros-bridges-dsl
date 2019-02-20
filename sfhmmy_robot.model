@@ -1,10 +1,10 @@
 AMQPBroker => {
   ip = "155.207.33.185";
   port = "5672";
-  username = 'robot_2';
-  password = 'r0b0t2';
-  vhost = '/production';
-  namespace = 'robot_2';
+  username = 'robot_1';
+  password = 'r0b0t1';
+  vhost = '/sfhmmy';
+  namespace = 'robot_1';
 
   section #topics
     AMQPTopic SonarFrontAMQPTopic => {
@@ -25,21 +25,6 @@ AMQPBroker => {
   endsection
 
   section #rpc
-    AMQPRPC GoToNextNodeAMQPRPC => {
-      exchange = '';
-      uri = 'go_to_next_node';
-    }
-
-    AMQPRPC RotateLeftAMQPRPC => {
-      exchange = '';
-      uri = 'rotate_left';
-    }
-
-    AMQPRPC RotateRightAMQPRPC => {
-      exchange = '';
-      uri = 'rotate_right';
-    }
-
     AMQPRPC SetPathAMQPRPC => {
       exchange = '';
       uri = 'set_path';
@@ -93,21 +78,6 @@ ROSSystem => {
   endsection
 
   section #services
-    ROSService GoToNextNodeROSService => {
-      uri = '/behaviour/control/motion/base/go_to_next_node';
-      srvType = 'std_srvs/Trigger';
-    }
-
-    ROSService RotateLeftROSService => {
-      uri = '/behaviour/control/motion/base/rotate_left';
-      srvType = 'std_srvs/Trigger';
-    }
-
-    ROSService RotateRightROSService => {
-      uri = '/behaviour/control/motion/base/rotate_right';
-      srvType = 'std_srvs/Trigger';
-    }
-
     ROSService SetPathROSService => {
       uri = '/behaviour/control/motion/base/set_path';
       srvType = 'robot_communication/SetPath';

@@ -174,9 +174,9 @@ class RosAMQPBridgesGen(Generator):
             ros_sub = conn.rosSub
             amqp_topic = conn.amqpTopic
             node_exec_name = conn.name.lower()
-            # Append the name of the ROS node
             gen_path = join(dest_pkg, 'scripts', '{}.py'.format(
                 node_exec_name))
+            # Append the name of the ROS node
             with open(gen_path, 'w') as f:
                 f.write(
                     tpl.render(
@@ -201,7 +201,7 @@ class RosAMQPBridgesGen(Generator):
         amqp_rpc = conn.amqpRPC
         self.logger.debug(
             '[*] Generated Connector: [AMQP RPC:{} -> ROS Service:{}]\n'.format(
-                ros_srv.uri, amqp_rpc.uri))
+                amqp_rpc.uri, ros_srv.uri))
 
     def _log_gen_sub(self, conn, pkg_root):
         ros_sub = conn.rosSub
@@ -216,8 +216,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('[*] - Usage: python {} <model>'.format(sys.argv[0]))
     else:
-        meta_model = metamodel_from_file(join(this_folder,
-                                              'ros-amqp-metamodel.tx'))
+        meta_model = metamodel_from_file(join(this_folder, 'ros-amqp-metamodel.tx'))
         model = meta_model.model_from_file(sys.argv[1])
         gen = RosAMQPBridgesGen()
         gen.generate(model)
