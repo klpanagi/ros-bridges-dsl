@@ -20,7 +20,7 @@ AMQPBroker:
         'endsection'
 
         'section #rpc'
-            topics*=AMQPRPC
+            rpcs*=AMQPRPC
         'endsection'
 	'}'
 ;
