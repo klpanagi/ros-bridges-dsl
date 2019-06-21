@@ -1,0 +1,88 @@
+
+    digraph textX {
+    fontname = "Bitstream Vera Sans"
+    fontsize = 8
+    node[
+        shape=record,
+        style=filled,
+        fillcolor=aliceblue
+    ]
+    nodesep = 0.3
+    edge[dir=black,arrowtail=empty]
+
+
+94064943195352[ label="{RosAmqpConnectorsMetamodel|}"]
+
+94064943166488[ label="{AMQPBroker|+ip:STRING\l+port:STRING\l+username:STRING\l+password:STRING\l+vhost:STRING\l+namespace:STRING\l}"]
+
+94064943326264[ label="{AMQPTopic|+name:ID\l+exchange:STRING\l+uri:STRING\l}"]
+
+94064943200888[ label="{AMQPRPC|+name:ID\l+exchange:STRING\l+uri:STRING\l}"]
+
+94064943331800[ label="{ROSPubConnector|+name:ID\l}"]
+
+94064943337336[ label="{ROSSubConnector|+name:ID\l}"]
+
+94064943342872[ label="{ROSServiceConnector|+name:ID\l}"]
+
+94064943348408[ label="{ROSSystem|}"]
+
+94064943353944[ label="{ROSPublisher|+name:ID\l+nodeName:STRING\l+queueSize:INT\l+latch:BOOL\l}"]
+
+94064943360600[ label="{ROSSubscriber|+name:ID\l+nodeName:STRING\l}"]
+
+94064943346408[ label="{ROSTopic|+name:ID\l+uri:STRING\l+msgType:STRING\l}"]
+
+94064943329800[ label="{ROSService|+name:ID\l+uri:STRING\l+srvType:STRING\l}"]
+
+94064943364600[ label="{Comment|\\/\\/.*$}"]
+
+94064943163544[ label="{ID|}"]
+
+94064943181336[ label="{STRING|}"]
+
+94064943186280[ label="{BOOL|}"]
+
+94064943191816[ label="{INT|}"]
+
+94064943197352[ label="{FLOAT|}"]
+
+94064943202888[ label="{STRICTFLOAT|}"]
+
+94064943208424[ label="{NUMBER|}"]
+
+94064943214552[ label="{BASETYPE|}"]
+
+94064943220088[ label="{*OBJECT|}"]
+
+
+
+94064943195352 -> 94064943166488[arrowtail=diamond, dir=both, headlabel="amqpBroker "]
+94064943195352 -> 94064943348408[arrowtail=diamond, dir=both, headlabel="rosSystem 0..*"]
+94064943195352 -> 94064943331800[arrowtail=diamond, dir=both, headlabel="rosPubConnectors 0..*"]
+94064943195352 -> 94064943337336[arrowtail=diamond, dir=both, headlabel="rosSubConnectors 0..*"]
+94064943195352 -> 94064943342872[arrowtail=diamond, dir=both, headlabel="rosServiceConnectors 0..*"]
+94064943166488 -> 94064943326264[arrowtail=diamond, dir=both, headlabel="topics 0..*"]
+94064943166488 -> 94064943200888[arrowtail=diamond, dir=both, headlabel="rpcs 0..*"]
+94064943331800 -> 94064943353944[headlabel="rosPub "]
+94064943331800 -> 94064943326264[headlabel="amqpTopic "]
+94064943337336 -> 94064943326264[headlabel="amqpTopic "]
+94064943337336 -> 94064943360600[headlabel="rosSub "]
+94064943342872 -> 94064943329800[headlabel="rosService "]
+94064943342872 -> 94064943200888[headlabel="amqpRPC "]
+94064943348408 -> 94064943353944[arrowtail=diamond, dir=both, headlabel="publishers 0..*"]
+94064943348408 -> 94064943360600[arrowtail=diamond, dir=both, headlabel="subscribers 0..*"]
+94064943348408 -> 94064943346408[arrowtail=diamond, dir=both, headlabel="topics 0..*"]
+94064943348408 -> 94064943329800[arrowtail=diamond, dir=both, headlabel="services 0..*"]
+94064943353944 -> 94064943346408[headlabel="topic "]
+94064943360600 -> 94064943346408[headlabel="topic "]
+94064943208424 -> 94064943202888 [dir=back]
+94064943208424 -> 94064943191816 [dir=back]
+94064943214552 -> 94064943208424 [dir=back]
+94064943214552 -> 94064943197352 [dir=back]
+94064943214552 -> 94064943186280 [dir=back]
+94064943214552 -> 94064943163544 [dir=back]
+94064943214552 -> 94064943181336 [dir=back]
+94064943220088 -> 94064943214552 [dir=back]
+
+}
