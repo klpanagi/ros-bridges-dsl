@@ -53,7 +53,8 @@ class {{ conn_name }}(object):
             ros_msg = dict_to_ros_msg('{{ rossub.topic.msgType }}', msg)
             self.pub.publish(ros_msg)
         except Exception as exc:
-            rospy.loginfo('Could not convert input message [{}] to {{ rossub.topic.msgType }}'.format(msg))
+            rospy.loginfo('Could not convert input message [{}]' + \
+                          ' to {{ rossub.topic.msgType }}'.format(msg))
 
     def _init_platform_subscriber(self):
         self.sub = amqp_common.SubscriberSync(

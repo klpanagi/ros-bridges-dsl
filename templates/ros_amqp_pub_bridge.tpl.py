@@ -34,12 +34,13 @@ class {{ conn_name }}(object):
         if connection:
             self.broker_conn = connection
             return
+
         self.broker_conn_params = amqp_common.ConnectionParameters(
             host=self.amqp_broker_ip, port=self.amqp_broker_port,
             vhost=self.amqp_broker_vhost)
+
         self.broker_conn_params.credentials = amqp_common.Credentials(
             self.username, self.password)
-        self.broker_conn = amqp_common.SharedConnection(self.broker_conn_params)
 
     @property
     def debug(self):
@@ -55,7 +56,7 @@ class {{ conn_name }}(object):
         self._init_platform_publisher()
         rospy.loginfo('Connector [ROS:{} -> AMQP:{}] ready'.format(self.ros_topic, self.amqp_topic))
         while not rospy.is_shutdown():
-            self.broker_conn.sleep(0.01)  # Sleep for 1ms to free cpu resources
+            rospy.sleep(0.001)
 
     def _init_ros_subscriber(self):
         if self.debug:
@@ -77,7 +78,7 @@ class {{ conn_name }}(object):
 
     def _init_platform_publisher(self):
         self.broker_pub = amqp_common.PublisherSync(
-            self.amqp_topic, connection=self.broker_conn)
+            self.amqp_topic, connection_params=self.broker_conn_params)
         rospy.loginfo('AMQP Publisher <{}> ready!'.format(self.amqp_topic))
 
     def _publish(self, data):
